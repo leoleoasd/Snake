@@ -1,40 +1,5 @@
-﻿#include <easyx.h>			// 引用图形库头文件
-#include <conio.h>
-#include <iostream>
-#include <cstring>
+﻿#include "Snake.h"
 using namespace std;
-#define WIDTH 220
-#define HEIGHT 260
-
-// Colors
-// C for normal colors, CT for text colors.
-#define C_BACK 0x0
-#define C_WALL 0xffffff
-#define C_MOUSEDOWN 0xffffff
-#define CT_SNAKE 0x0285EE
-#define CT_START 0xffffff
-#define CT_SCORE 0xffffff
-
-struct funcPtr {
-	funcPtr (*next)(void);
-	funcPtr operator()(){
-		return next();
-	}
-	funcPtr(funcPtr(*a)(void)) {
-		next = a;
-	}
-};
-
-void setFont(int size) {
-	LOGFONT f;
-	gettextstyle(&f);
-	f.lfHeight = size;
-	f.lfWidth = size / 2;
-	f.lfPitchAndFamily = FIXED_PITCH | FF_MODERN;
-
-	wcscpy_s(f.lfFaceName, L"November");
-	settextstyle(&f);
-}
 
 void init() {
 	initgraph(WIDTH, HEIGHT, SHOWCONSOLE);
@@ -42,10 +7,30 @@ void init() {
 	cleardevice();
 }
 
-funcPtr start();
-funcPtr game();
-funcPtr pause();
-funcPtr end();
+void draw(snake s) {
+	// draw a snake body;
+
+	// 0: 转弯
+	// 1: 直, 交叉
+	// 2: 直, 直
+	// 3: 头
+	// 4: 尾
+	//
+	// 默认方向从右往左。
+	int bitmap[][10][10] = {
+		#include "body.dat"
+	};
+	if (s.type == 0)
+	{
+		if (s.type == snake::TURN)
+		{
+			// 转弯
+			
+
+		}
+	}
+}
+
 
 funcPtr start() {
 	cleardevice();
@@ -71,14 +56,21 @@ funcPtr start() {
 	outtextxy((10), (225), L"Scores: 0");
 	while (true) {
 		auto msg = GetMouseMsg();
-		if (70 <= msg.x and msg.x <= 148 and 150 <= msg.y and msg.y <= 172) {
+		cout << "Get Msg!" << msg.x<<endl;
+		if (70 <= msg.x and msg.x <= 150 and 138 <= msg.y and msg.y <= 172) {
 			if (msg.uMsg == WM_LBUTTONDOWN) {
 				setlinecolor(C_MOUSEDOWN);
 				rectangle((72 - 2), (140 - 2), (148 + 2), (170 + 2));
-				cout << "Mouse DOWN!";
+				cout << "Mouse DOWN!" << endl;
 			}else if (msg.uMsg == WM_LBUTTONUP) {
 				// Enter main game function.
 				return game;
+			}
+		}else {
+			if (msg.uMsg == WM_LBUTTONUP) {
+				setlinecolor(CT_START);
+				setlinestyle(PS_SOLID | PS_ENDCAP_SQUARE, 2);
+				rectangle((72 - 2), (140 - 2), (148 + 2), (170 + 2));
 			}
 		}
 	}
@@ -90,13 +82,13 @@ funcPtr game() {
 		cout << "Clearing" << 0 << i << WIDTH << i + 20 << endl;
 		Sleep(30);
 	}
-	fillrectangle((20), (20), (100), (90));
+	fillrectangle(20, 20, 100, 90);
 	return pause;
 }
 
 funcPtr pause() {
 	cleardevice();
-	fillrectangle((20), (20), (100), (40));
+	fillrectangle(20, 20,100, 40);
 	return game;
 }
 
