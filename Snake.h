@@ -3,7 +3,8 @@
 #include <conio.h>
 #include <iostream>
 #include <cstring>
-#include "resource.h"
+
+#define SNAKE_SIZE 20
 
 struct funcPtr {
 	funcPtr(*next)(void);
@@ -15,7 +16,12 @@ struct funcPtr {
 	}
 };
 
-struct snake
+enum class SnakeType
+{
+	DIRECT, DIRECT2,TURN, HEAD, TAIL
+};
+
+struct Snake
 {
 	int x;
 	int y;
@@ -24,15 +30,12 @@ struct snake
 	int direction;
 	
 	// 0: body, 1: turn, 2: head, 3: tail
-	int type = 0;
-
-	const int DIRECT = 0;
-	const int TURN = 1;
-	const int HEAD = 2;
-	const int TAIL = 3;
+	SnakeType type = SnakeType::DIRECT;
 };
 
-void setFont(int size);
+#include "resource.h"
+#include "utils.h"
+
 funcPtr start();
 funcPtr game();
 funcPtr pause();

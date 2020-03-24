@@ -1,9 +1,9 @@
 #pragma once
 
-#define WIDTH 220
-#define HEIGHT 260
-#define S_OFFSET_X 20
-#define S_OFFSET_Y 20
+#define WIDTH 440
+#define HEIGHT 520
+#define S_OFFSET_X 40
+#define S_OFFSET_Y 40
 
 // Colors
 // C for normal colors, CT for text colors.
