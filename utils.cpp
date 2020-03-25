@@ -14,23 +14,13 @@ void setFont(int size) {
 
 
 
-void draw(Snake s) {
-	// draw a Snake body;
-
+void draw(Snake &s, int dot) {
+	// 绘制蛇的一节
 	// 默认方向从右往左。
-	static int bitmap[][SNAKE_SIZE][SNAKE_SIZE] = {
+	
+	static int bitmap[][2][SNAKE_SIZE][SNAKE_SIZE] = {
 		#include "body.dat"
 	};
-	switch (s.type)
-	{
-	case SnakeType::DIRECT:
-
-		break;
-	case SnakeType::TURN:
-
-		break;
-	}
-	// Rotate: a[i][j] = a[n-1-j][i]
 	int nowx, nowy, temp;
 	BeginBatchDraw();
 	for (int i = 0; i < SNAKE_SIZE; ++i)
@@ -45,7 +35,7 @@ void draw(Snake s) {
 				nowx = SNAKE_SIZE - 1 - nowy;
 				nowy = temp;
 			}
-			switch (bitmap[(int)s.type][nowx][nowy])
+			switch (bitmap[(int)s.type][dot][nowx][nowy])
 			{
 			case 1:
 				putpixel(

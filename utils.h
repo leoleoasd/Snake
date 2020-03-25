@@ -1,4 +1,4 @@
 #pragma once
 
 void setFont(int size);
-void draw(Snake s);
+void draw(Snake s, int dot);

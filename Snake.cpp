@@ -1,6 +1,5 @@
 ﻿#include "Snake.h"
 
-#include <set>
 using namespace std;
 
 void init() {
