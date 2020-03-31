@@ -3,7 +3,7 @@
 funcPtr start() {
 	cleardevice();
 	setlinecolor(C_WALL);
-	setlinestyle(PS_SOLID | PS_ENDCAP_SQUARE, (10));
+	setlinestyle(PS_SOLID | PS_ENDCAP_SQUARE, 20);
 	line(10, 10, 10, 430);
 	line(10, 10, 430, 10);
 	line(430, 10, 430, 430);
@@ -37,7 +37,6 @@ funcPtr start() {
 		else {
 			if (msg.uMsg == WM_LBUTTONUP) {
 				setlinecolor(CT_START);
-				setlinestyle(PS_SOLID | PS_ENDCAP_SQUARE, 2);
 				rectangle(2 * (72 - 2), 2 * (140 - 2), 2 * (148 + 2), 2 * (170 + 2));
 			}
 		}

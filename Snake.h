@@ -18,8 +18,7 @@ struct funcPtr {
 
 enum class SnakeType
 {
-	//DIRECT_SWITCH, DIRECT_SWITCH2,DIRECT,TURN, HEAD, TAIL
-	DIRECT, TURN, HEAD, TAIL
+	DIRECT, TURN_LEFT, TURN_RIGHT, HEAD, TAIL
 };
 
 struct Snake
