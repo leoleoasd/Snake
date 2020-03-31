@@ -18,7 +18,8 @@ struct funcPtr {
 
 enum class SnakeType
 {
-	DIRECT, DIRECT2,TURN, HEAD, TAIL
+	//DIRECT_SWITCH, DIRECT_SWITCH2,DIRECT,TURN, HEAD, TAIL
+	DIRECT, TURN, HEAD, TAIL
 };
 
 struct Snake
@@ -31,6 +32,8 @@ struct Snake
 	
 	// 0: body, 1: turn, 2: head, 3: tail
 	SnakeType type = SnakeType::DIRECT;
+
+	Snake* next;
 };
 
 #include "resource.h"

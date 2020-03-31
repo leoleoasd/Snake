@@ -12,15 +12,15 @@ void setFont(int size) {
 	settextstyle(&f);
 }
 
-
-
-void draw(Snake &s, int dot) {
+void _draw_real(SnakeType last,Snake& s, bool dot)
+{
 	// 绘制蛇的一节
-	// 默认方向从右往左。
-	
+    // 默认方向从右往左。
+
 	static int bitmap[][2][SNAKE_SIZE][SNAKE_SIZE] = {
 		#include "body.dat"
 	};
+
 	int nowx, nowy, temp;
 	BeginBatchDraw();
 	for (int i = 0; i < SNAKE_SIZE; ++i)
@@ -35,7 +35,8 @@ void draw(Snake &s, int dot) {
 				nowx = SNAKE_SIZE - 1 - nowy;
 				nowy = temp;
 			}
-			switch (bitmap[(int)s.type][dot][nowx][nowy])
+			// DIRECT_SWITCH, DIRECT_SWITCH2,DIRECT,TURN, HEAD, TAIL
+			switch (bitmap[(int)s.type][dot][nowy][nowx])
 			{
 			case 1:
 				putpixel(
@@ -55,4 +56,12 @@ void draw(Snake &s, int dot) {
 		}
 	}
 	EndBatchDraw();
+}
+
+void draw(Snake& s, bool dot) {
+	_draw_real(SnakeType::DIRECT, s, dot);
+}
+
+void draw(Snake* s, bool dot) {
+	_draw_real(SnakeType::DIRECT,*s, dot);
 }
