@@ -12,7 +12,7 @@ funcPtr game() {
 	
 	static int dot = 0;
 	dot = ~dot;
-	Snake *s = new Snake{ 0,0,3,SnakeType::DIRECT };
+	Snake *s = new Snake{ 0,0,3,SnakeType::TURN_LEFT };
 	Snake* head = s;
 	for(int i = 0; i < 20; ++ i)
 	{
