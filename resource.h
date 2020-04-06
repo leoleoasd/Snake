@@ -10,11 +10,22 @@
 #define C_BACK 0x0
 #define C_WALL 0xffffff
 #define C_MOUSEDOWN 0x0
-// Snake body
+// SnakeNode body
 #define C_SB 0xffffff
-// Snake dot
+// SnakeNode dot
 #define C_SD 0x0
+// Food
+#define C_FOOD 0xffffff
 
 #define CT_SNAKE 0x0285EE
-#define CT_START 0xffffff
+#define CT_START 0xede3d0
+// 0xffffff
 #define CT_SCORE 0xffffff
+
+#define TIK (int(0.5 * CLOCKS_PER_SEC))
+#define DOT_TIK (int(0.25 * CLOCKS_PER_SEC))
+
+#define KEY_UP 72
+#define KEY_DOWN 80
+#define KEY_LEFT 75
+#define KEY_RIGHT 77

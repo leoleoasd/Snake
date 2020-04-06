@@ -1,35 +1,28 @@
 ﻿#include "Snake.h"
-
+#include <random>
 using namespace std;
 
 void init() {
-	
-	initgraph(WIDTH, HEIGHT, SHOWCONSOLE);
-	setbkcolor(C_BACK);
-	cleardevice();
-}
-
-
-funcPtr pause() {
-	cleardevice();
-	fillrectangle(2 * 20, 2 * 20, 2 * 100, 2 * 40);
-	return game;
+    initgraph(WIDTH, HEIGHT, EW_SHOWCONSOLE);
+    setbkcolor(C_BACK);
+    cleardevice();
+    std::random_device rd;
+    srand(rd());
 }
 
 funcPtr end() {
-	// TODO: 展示排行榜
-	return nullptr;
+    // TODO: 展示排行榜
+    return nullptr;
 }
 
-int main()
-{
-	init();
+int main() {
+    init();
 
-	funcPtr func = start;
-	while (func.next != nullptr) {
-		func = func();
-	}
+    funcPtr func = start;
+    while (func != nullptr) {
+        func = func();
+    }
 
-	closegraph();
-	return 0;
+    closegraph();
+    return 0;
 }

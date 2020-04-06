@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Snake.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="utils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -27,20 +24,26 @@
     <ClCompile Include="game.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Snake.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Snake.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="utils.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Snake.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="body.dat">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="fruit.dat">
       <Filter>资源文件</Filter>
     </None>
   </ItemGroup>
