@@ -101,7 +101,7 @@ funcPtr start() {
     line(10, 430, 430, 430);
 
     Snake* s = makeDemoSnake();
-    draw(s, 1);
+    draw(s, 1,1);
 
     setFont(60);
     setbkmode(TRANSPARENT);

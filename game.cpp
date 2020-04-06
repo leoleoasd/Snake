@@ -31,8 +31,30 @@ void draw_wall(int x, int y) {
 }
 
 void draw_food(int x, int y, int dot) {
-    static int data[2][10][10] = {
-#include "fruit.dat"
+    static int data[2][10][10] = {{
+                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                      {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
+                                      {0, 0, 1, 1, 1, 1, 1, 1, 0, 0},
+                                      {0, 0, 1, 1, 1, 1, 1, 1, 0, 0},
+                                      {0, 0, 1, 1, 1, 1, 1, 1, 0, 0},
+                                      {0, 0, 1, 1, 1, 1, 1, 1, 0, 0},
+                                      {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
+                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                  },
+                                  {
+                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                      {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
+                                      {0, 0, 1, 1, 1, 1, 1, 1, 0, 0},
+                                      {0, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+                                      {0, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+                                      {0, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+                                      {0, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+                                      {0, 0, 1, 1, 1, 1, 1, 1, 0, 0},
+                                      {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
+                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                  }
     };
     for (int i = 0; i < SNAKE_SIZE; ++i) {
         for (int j = 0; j < SNAKE_SIZE; ++j) {
@@ -40,6 +62,7 @@ void draw_food(int x, int y, int dot) {
                 putpixel(x * SNAKE_SIZE + S_OFFSET_X + i,
                          y * SNAKE_SIZE + S_OFFSET_Y + j, C_FOOD);
         }
+        cout << endl;
     }
 }
 
@@ -75,10 +98,6 @@ funcPtr game() {
         Sleep(20);
     }
 
-    static int dot = 0;
-    clock_t t = clock();
-    clock_t d = t;
-    int score = 0;
     Snake* s = makeStartSnake();
     map_t map{1};
     {
@@ -93,6 +112,11 @@ funcPtr game() {
 
     int eating = 0;
     int moving = 0;
+    int dot = 1;
+    clock_t t = clock();
+    clock_t d = t;
+    int score = 0;
+    int snake_status = 1;
 
     setlinecolor(C_WALL);
     setlinestyle(PS_SOLID | PS_ENDCAP_SQUARE, 20);
@@ -154,6 +178,7 @@ funcPtr game() {
         // Move snake if needed.
         if ((clock() - t) > TIK or moving) {
             t = clock();
+            snake_status = !snake_status;
             auto [tox, toy] = s->towards();
             if (map[tox][toy] == 1) {
                 // DIED!;
@@ -200,7 +225,7 @@ funcPtr game() {
         // Drawing.
         if (clock() - d >= DOT_TIK) {
             d = clock();
-            dot = ~dot;
+            dot = !dot;
         }
         BeginBatchDraw();
         cleardevice();
@@ -210,7 +235,7 @@ funcPtr game() {
         line(10, 10, 430, 10);
         line(430, 10, 430, 430);
         line(10, 430, 430, 430);
-        draw(s, dot);
+        draw(s, dot, snake_status);
         for (int i = 0; i < 20; ++i) {
             for (int j = 0; j < 20; ++j) {
                 if (map[i][j] == 1) {

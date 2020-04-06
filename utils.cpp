@@ -54,20 +54,20 @@ void _draw_real(SnakeNode& s, bool dot, int last_side) {
     }
 }
 
-void draw(SnakeNode& s, bool dot) {
-    draw(&s, dot);
+void draw(SnakeNode& s, bool dot, int start) {
+    draw(&s, dot, start);
 }
 
-void draw(Snake& s, bool dot) {
-    draw(s.s, dot);
+void draw(Snake& s, bool dot, int start) {
+    draw(s.s, dot, start);
 }
 
-void draw(Snake* s, bool dot) {
-    draw(s->s, dot);
+void draw(Snake* s, bool dot, int start) {
+    draw(s->s, dot, start);
 }
 
-void draw(SnakeNode* s, bool dot) {
-    int last = 1;
+void draw(SnakeNode* s, bool dot, int start) {
+    int last = start;
     while (s != nullptr) {
         _draw_real(*s, dot, last);
         last = 1 - last;
