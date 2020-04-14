@@ -17,6 +17,11 @@ struct funcPtr {
 };
 
 enum class SnakeType { DIRECT, TURN_LEFT, TURN_RIGHT, HEAD, TAIL };
+typedef int map_t[20][20];
+extern map_t maps[];
+extern int maps_count;
+extern int map_selected;
+
 
 struct SnakeNode {
     int x = 0;
@@ -39,6 +44,7 @@ struct Snake {
 
     SnakeNode* s;
     int heading;
+    int status = 1;
 
     Snake() : s(nullptr), heading(0) {}
 
@@ -55,14 +61,48 @@ struct Snake {
 
     void turn_right() { this->heading = (this->heading + 3) % 4; }
 
-    [[nodiscard]] std::tuple<int, int> towards() const {
+    std::tuple<int, int> towards() const {
         return std::make_tuple((this->s->x + Snake::dir[heading][0] + 20) % 20,
                                (this->s->y + Snake::dir[heading][1] + 20) % 20);
+    }
+
+    std::tuple<int, int> move(int eating) {
+        status = !status;
+        auto [tox, toy] = this->towards();
+        SnakeNode* newhead =
+            new SnakeNode(tox, toy, this->heading, SnakeType::HEAD);
+        newhead->next = this->s;
+        if (this->heading == this->s->direction) {
+            this->s->type = SnakeType::DIRECT;
+        } else {
+            if ((this->heading + 3) % 4 == this->s->direction) {
+                this->s->type = SnakeType::TURN_LEFT;
+            } else {
+                this->s->type = SnakeType::TURN_RIGHT;
+            }
+        }
+        this->s = newhead;
+        int retx = 0;
+        int rety = 0;
+        if (!eating) {
+            int dddd = 0;
+            while (newhead->next->next != nullptr) {
+                dddd = newhead->direction;
+                newhead = newhead->next;
+            }
+            newhead->type = SnakeType::TAIL;
+            newhead->direction = dddd;
+            retx = newhead->next->x;
+            rety = newhead->next->y;
+            delete newhead->next;
+            newhead->next = nullptr;
+        }
+        return std::make_tuple(retx, rety);
     }
 };
 
 #include "resource.h"
-#include "utils.h"
+#include "rendering.h"
 
 funcPtr start();
 funcPtr game();

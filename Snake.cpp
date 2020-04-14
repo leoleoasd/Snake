@@ -1,5 +1,7 @@
 ﻿#include "Snake.h"
 #include <random>
+#include <MMSystem.h>
+#pragma comment(lib, "winmm.lib")
 using namespace std;
 
 void init() {
@@ -8,6 +10,9 @@ void init() {
     cleardevice();
     std::random_device rd;
     srand(rd());
+
+    mciSendString(L"open bgm.mp3 alias bgm", NULL, 0, NULL);
+    mciSendString(L"open game.mp3 alias game", NULL, 0, NULL);
 }
 
 funcPtr end() {

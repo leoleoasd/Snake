@@ -3,8 +3,6 @@
 #include "Snake.h"
 using namespace std;
 
-typedef int map_t[20][20];
-
 Snake* makeStartSnake() {
     Snake* ret = new Snake;
     ret->heading = 0;
@@ -19,51 +17,6 @@ Snake* makeStartSnake() {
     tail->next = new SnakeNode(12, 9, 0, SnakeType::TAIL);
     tail = tail->next;
     return ret;
-}
-
-void draw_wall(int x, int y) {
-    setlinestyle(PS_NULL);
-    setfillcolor(C_WALL);
-    setlinecolor(C_WALL);
-    fillrectangle(x * SNAKE_SIZE + S_OFFSET_X, y * SNAKE_SIZE + S_OFFSET_Y,
-                  (x + 1) * SNAKE_SIZE + S_OFFSET_X,
-                  (y + 1) * SNAKE_SIZE + S_OFFSET_Y);
-}
-
-void draw_food(int x, int y, int dot) {
-    static int data[2][10][10] = {{
-                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                      {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-                                      {0, 0, 1, 1, 1, 1, 1, 1, 0, 0},
-                                      {0, 0, 1, 1, 1, 1, 1, 1, 0, 0},
-                                      {0, 0, 1, 1, 1, 1, 1, 1, 0, 0},
-                                      {0, 0, 1, 1, 1, 1, 1, 1, 0, 0},
-                                      {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                  },
-                                  {
-                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                      {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-                                      {0, 0, 1, 1, 1, 1, 1, 1, 0, 0},
-                                      {0, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-                                      {0, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-                                      {0, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-                                      {0, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-                                      {0, 0, 1, 1, 1, 1, 1, 1, 0, 0},
-                                      {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                  }
-    };
-    for (int i = 0; i < SNAKE_SIZE; ++i) {
-        for (int j = 0; j < SNAKE_SIZE; ++j) {
-            if (data[dot][i / 2][j / 2])
-                putpixel(x * SNAKE_SIZE + S_OFFSET_X + i,
-                         y * SNAKE_SIZE + S_OFFSET_Y + j, C_FOOD);
-        }
-        cout << endl;
-    }
 }
 
 tuple<int, int> make_fruit(map_t map) {
@@ -92,6 +45,24 @@ void pause_game() {
     cleardevice();
 }
 
+void end_game(int scores) {
+    for (int i = 0; i < HEIGHT; i += 40) {
+        clearrectangle(0, i, WIDTH, i + 40);
+        Sleep(20);
+    }
+    wstring output = L"Scores: ";
+    wstring name = L"";
+    output += to_wstring(scores);
+    setFont(60);
+    settextcolor(CT_START);
+    outtextxy(85,  10, L"YOU DIED!");
+    outtextxy(70, 70, output.c_str());
+
+    setFont(30);
+    outtextxy(50, 120, (L"Name:" + name).c_str());
+    _getch();
+}
+
 funcPtr game() {
     for (int i = 0; i < HEIGHT; i += 40) {
         clearrectangle(0, i, WIDTH, i + 40);
@@ -99,13 +70,17 @@ funcPtr game() {
     }
 
     Snake* s = makeStartSnake();
-    map_t map{1};
+    map_t map{};
     {
         SnakeNode* t = s->s;
         while (t != nullptr) {
             map[t->x][t->y] = 2;
             t = t->next;
         }
+        for (int i = 0; i < 20; ++ i)
+            for (int j = 0; j < 20; ++j) {
+                map[i][j] = maps[map_selected][i][j];
+            }
     }
     int fruit_x = 7;
     int fruit_y = 9;
@@ -116,14 +91,10 @@ funcPtr game() {
     clock_t t = clock();
     clock_t d = t;
     int score = 0;
-    int snake_status = 1;
 
-    setlinecolor(C_WALL);
-    setlinestyle(PS_SOLID | PS_ENDCAP_SQUARE, 20);
-    line(10, 10, 10, 430);
-    line(10, 10, 430, 10);
-    line(430, 10, 430, 430);
-    line(10, 430, 430, 430);
+    
+    mciSendString(L"stop bgm", NULL, 0, NULL);
+    mciSendString(L"play game repeat", NULL, 0, NULL);
 
     while (true) {
         // Keyboard Event Handling.
@@ -178,40 +149,17 @@ funcPtr game() {
         // Move snake if needed.
         if ((clock() - t) > TIK or moving) {
             t = clock();
-            snake_status = !snake_status;
             auto [tox, toy] = s->towards();
             if (map[tox][toy] == 1) {
-                // DIED!;
+                end_game(score);
                 return nullptr;
             }
             eating = (tox == fruit_x and toy == fruit_y);
-            SnakeNode* newhead =
-                new SnakeNode(tox, toy, s->heading, SnakeType::HEAD);
-            newhead->next = s->s;
-            if (s->heading == s->s->direction) {
-                s->s->type = SnakeType::DIRECT;
-            } else {
-                if ((s->heading + 3) % 4 == s->s->direction) {
-                    s->s->type = SnakeType::TURN_LEFT;
-                } else {
-                    s->s->type = SnakeType::TURN_RIGHT;
-                }
-            }
-            s->s = newhead;
-            if (!eating) {
-                int dddd = 0;
-                while (newhead->next->next != nullptr) {
-                    dddd = newhead->direction;
-                    newhead = newhead->next;
-                }
-                newhead->type = SnakeType::TAIL;
-                newhead->direction = dddd;
-                map[newhead->next->x][newhead->next->y] = 0;
-                delete newhead->next;
-                newhead->next = nullptr;
-            }
+            auto [tx,ty] = s->move(eating);
+            map[tx][ty] = 0;
             if (map[tox][toy] == 2) {
                 // DIED!;
+                end_game(score);
                 return nullptr;
             }
             map[tox][toy] = 2;
@@ -229,13 +177,13 @@ funcPtr game() {
         }
         BeginBatchDraw();
         cleardevice();
-        setlinecolor(C_WALL);
+        setlinecolor(C_SB);
         setlinestyle(PS_SOLID | PS_ENDCAP_SQUARE, 20);
         line(10, 10, 10, 430);
         line(10, 10, 430, 10);
         line(430, 10, 430, 430);
         line(10, 430, 430, 430);
-        draw(s, dot, snake_status);
+        draw(s, dot);
         for (int i = 0; i < 20; ++i) {
             for (int j = 0; j < 20; ++j) {
                 if (map[i][j] == 1) {
@@ -249,5 +197,7 @@ funcPtr game() {
         setlinecolor(CT_SCORE);
         outtextxy(2 * (10), 2 * (225), (wstring{L"Scores: "} + to_wstring(score)).c_str());
         EndBatchDraw();
+
+        Sleep(20);
     }
 }

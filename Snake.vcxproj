@@ -165,17 +165,20 @@
   <ItemGroup>
     <ClCompile Include="Snake.cpp" />
     <ClCompile Include="start.cpp" />
-    <ClCompile Include="utils.cpp" />
+    <ClCompile Include="rendering.cpp" />
     <ClCompile Include="game.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="Snake.h" />
-    <ClInclude Include="utils.h" />
+    <ClInclude Include="rendering.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="body.dat" />
     <None Include="fruit.dat" />
+    <None Include="maps.dat" />
+    <None Include="readme.md" />
+    <None Include="theme.dat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

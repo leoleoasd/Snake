@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="utils.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="start.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -27,15 +24,18 @@
     <ClCompile Include="Snake.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="rendering.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="utils.h">
+    <ClInclude Include="Snake.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Snake.h">
+    <ClInclude Include="rendering.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,6 +44,15 @@
       <Filter>资源文件</Filter>
     </None>
     <None Include="fruit.dat">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="theme.dat">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="maps.dat">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="readme.md">
       <Filter>资源文件</Filter>
     </None>
   </ItemGroup>
