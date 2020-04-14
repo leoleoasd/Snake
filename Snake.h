@@ -34,9 +34,10 @@ struct SnakeNode {
     SnakeType type = SnakeType::DIRECT;
 
     SnakeNode* next;
+    SnakeNode* last;
 
-    SnakeNode(int x, int y, int direction, SnakeType type)
-        : x(x), y(y), direction(direction), type(type), next(nullptr) {}
+    SnakeNode(int x, int y, int direction, SnakeType type,SnakeNode* last)
+        : x(x), y(y), direction(direction), type(type), next(nullptr), last(last) {}
 };
 
 struct Snake {
@@ -70,8 +71,9 @@ struct Snake {
         status = !status;
         auto [tox, toy] = this->towards();
         SnakeNode* newhead =
-            new SnakeNode(tox, toy, this->heading, SnakeType::HEAD);
+            new SnakeNode(tox, toy, this->heading, SnakeType::HEAD, nullptr);
         newhead->next = this->s;
+        this->s->last = newhead;
         if (this->heading == this->s->direction) {
             this->s->type = SnakeType::DIRECT;
         } else {
@@ -85,17 +87,15 @@ struct Snake {
         int retx = 0;
         int rety = 0;
         if (!eating) {
-            int dddd = 0;
-            while (newhead->next->next != nullptr) {
-                dddd = newhead->direction;
+            while (newhead->next != nullptr) {
                 newhead = newhead->next;
             }
-            newhead->type = SnakeType::TAIL;
-            newhead->direction = dddd;
-            retx = newhead->next->x;
-            rety = newhead->next->y;
-            delete newhead->next;
-            newhead->next = nullptr;
+            newhead->last->type = SnakeType::TAIL;
+            newhead->last->direction = newhead->last->last->direction;
+            retx = newhead->x;
+            rety = newhead->y;
+            newhead->last->next = nullptr;
+            delete newhead;
         }
         return std::make_tuple(retx, rety);
     }

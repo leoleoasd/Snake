@@ -6,15 +6,15 @@ using namespace std;
 Snake* makeStartSnake() {
     Snake* ret = new Snake;
     ret->heading = 0;
-    ret->s = new SnakeNode(8, 9, 0, SnakeType::HEAD);
+    ret->s = new SnakeNode(8, 9, 0, SnakeType::HEAD, nullptr);
     SnakeNode* tail = ret->s;
-    tail->next = new SnakeNode(9, 9, 0, SnakeType::DIRECT);
+    tail->next = new SnakeNode(9, 9, 0, SnakeType::DIRECT, tail);
     tail = tail->next;
-    tail->next = new SnakeNode(10, 9, 0, SnakeType::DIRECT);
+    tail->next = new SnakeNode(10, 9, 0, SnakeType::DIRECT, tail);
     tail = tail->next;
-    tail->next = new SnakeNode(11, 9, 0, SnakeType::DIRECT);
+    tail->next = new SnakeNode(11, 9, 0, SnakeType::DIRECT, tail);
     tail = tail->next;
-    tail->next = new SnakeNode(12, 9, 0, SnakeType::TAIL);
+    tail->next = new SnakeNode(12, 9, 0, SnakeType::TAIL, tail);
     tail = tail->next;
     return ret;
 }
