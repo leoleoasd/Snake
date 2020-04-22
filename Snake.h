@@ -1,11 +1,11 @@
 #pragma once
 #include <conio.h>
-#include <easyx.h>  // 引用图形库头文件
-
+#include <easyx.h>
 #include <cstring>
 #include <iostream>
 #include <tuple>
 #include <string>
+#include <queue>
 
 #define SNAKE_SIZE 20
 
@@ -21,6 +21,7 @@ typedef int map_t[20][20];
 extern map_t maps[];
 extern int maps_count;
 extern int map_selected;
+extern std::queue<wchar_t> key_queue;
 
 
 struct SnakeNode {

@@ -1,5 +1,10 @@
 #include <ctime>
 #include <random>
+
+#include <locale>
+#include <codecvt>
+#include <fstream>
+
 #include "Snake.h"
 using namespace std;
 
@@ -53,13 +58,116 @@ void end_game(int scores) {
     wstring output = L"Scores: ";
     wstring name = L"";
     output += to_wstring(scores);
-    setFont(60);
     settextcolor(CT_START);
-    outtextxy(85,  10, L"YOU DIED!");
-    outtextxy(70, 70, output.c_str());
+
+    
+    //std::wstring_convert<std::codecvt_byname<wchar_t, char, mbstate_t>> conv1(
+    //    new std::codecvt_byname<wchar_t, char, mbstate_t>(
+    //        ".936"));
+    key_queue = queue<wchar_t>(); // Clear queue;
+    while (true) {
+        int flag = 0;
+        while (!key_queue.empty()) {
+            wchar_t c = key_queue.front();
+            key_queue.pop();
+            if (name.size() < 20) {
+                if (!iswcntrl(c)) {
+                    name = name + c;
+                }
+            }
+            if (name.size() > 0) {
+                if (c == '\b') {
+                    name = name.substr(0, name.size() - 1);
+                }
+            }
+            if (c == '\r') {
+                flag = 1;
+                break;
+            }
+        }
+        if (flag) {
+            break;
+        }
+
+        BeginBatchDraw();
+        cleardevice();
+        setFont(60);
+        outtextxy(85, 20, L"YOU DIED!");
+        outtextxy(70, 90, output.c_str());
+
+        setFont(30);
+        outtextxy(50, 160, (L"Name:" + name).c_str());
+        EndBatchDraw();
+    }
+    while (_kbhit()) {
+        _getch();
+    }
+    wstring rk_names[5];
+    int rk_scores[5] = {0};
+    ifstream fin;
+    fin.open("data.dat", ios::in);
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
+    if (fin) {
+        string tmp;
+        int pos = 0;
+        while (fin >> tmp) {
+            rk_names[pos] = conv.from_bytes(tmp);
+            fin >> rk_scores[pos++];
+            if (pos >= 4)
+                break;
+        }
+    }
+    fin.close();
+
+    for (int i = 0; i < 5; ++i) {
+        if (rk_scores[i] < scores) {
+            for (int j = 4; j >= i; --j) {
+                rk_scores[j] = rk_scores[j - 1];
+                rk_names[j] = rk_names[j - 1];
+            }
+            rk_scores[i] = scores;
+            rk_names[i] = name;
+            break;
+        }
+    }
+    BeginBatchDraw();
+    cleardevice();
+    setFont(60);
+    outtextxy(85, 20, L"YOU DIED!");
+    outtextxy(70, 90, output.c_str());
 
     setFont(30);
-    outtextxy(50, 120, (L"Name:" + name).c_str());
+    outtextxy(50, 160, L"RANK:");
+    EndBatchDraw();
+    for (int i = 0; i < 5; ++i) {
+        if (rk_names[i].size()) {
+            setFont(30);
+            outtextxy(50, 200 + 35 * i,
+                      (to_wstring(i + 1) + L"." + rk_names[i] + L": " +
+                       to_wstring(rk_scores[i]))
+                          .c_str());
+        } else {
+            break;
+        }
+    }
+
+    ofstream fout;
+    fout.open("data.dat");
+    if (fout) {
+        for (int i = 0; i < 5; ++i) {
+            if (rk_names[i].size()) {
+                auto s = conv.to_bytes(rk_names[i]);
+                fout.write(s.c_str(), s.size());
+                fout << " ";
+                fout << rk_scores[i];
+                fout << "\n";
+            } else {
+                break;
+            }
+        }
+    }
+    fout.close();
+
     _getch();
 }
 
@@ -73,14 +181,14 @@ funcPtr game() {
     map_t map{};
     {
         SnakeNode* t = s->s;
-        while (t != nullptr) {
-            map[t->x][t->y] = 2;
-            t = t->next;
-        }
         for (int i = 0; i < 20; ++ i)
             for (int j = 0; j < 20; ++j) {
                 map[i][j] = maps[map_selected][i][j];
             }
+        while (t != nullptr) {
+            map[t->x][t->y] = 2;
+            t = t->next;
+        }
     }
     int fruit_x = 7;
     int fruit_y = 9;
@@ -91,6 +199,11 @@ funcPtr game() {
     clock_t t = clock();
     clock_t d = t;
     int score = 0;
+
+    int hit_wall = 0;
+    int hit_body = 0;
+    int hit_x = 0;
+    int hit_y = 0;
 
     
     mciSendString(L"stop bgm", NULL, 0, NULL);
@@ -103,10 +216,9 @@ funcPtr game() {
         if (_kbhit()) {
             auto key = _getch();
             switch (key) {
-                case 27:
+                case KEY_ESCAPE:
                     pause_game();
                     continue;
-                    break;
                 case KEY_UP:
                     if (s->heading == 3)
                         moving = 1;
@@ -151,16 +263,19 @@ funcPtr game() {
             t = clock();
             auto [tox, toy] = s->towards();
             if (map[tox][toy] == 1) {
-                end_game(score);
-                return nullptr;
+                hit_wall = 1;
+                hit_x = s->s->x;
+                hit_y = s->s->y;
+                break;
             }
             eating = (tox == fruit_x and toy == fruit_y);
             auto [tx,ty] = s->move(eating);
             map[tx][ty] = 0;
             if (map[tox][toy] == 2) {
-                // DIED!;
-                end_game(score);
-                return nullptr;
+                hit_body = 1;
+                hit_x = s->s->x;
+                hit_y = s->s->y;
+                break;
             }
             map[tox][toy] = 2;
 
@@ -197,7 +312,116 @@ funcPtr game() {
         setlinecolor(CT_SCORE);
         outtextxy(2 * (10), 2 * (225), (wstring{L"Scores: "} + to_wstring(score)).c_str());
         EndBatchDraw();
-
-        Sleep(20);
     }
+
+    mciSendString(L"stop game", NULL, 0, NULL);
+
+    if (hit_wall) {
+        while (s->s != nullptr) {
+
+            BeginBatchDraw();
+            cleardevice();
+            setlinecolor(C_SB);
+            setlinestyle(PS_SOLID | PS_ENDCAP_SQUARE, 20);
+            line(10, 10, 10, 430);
+            line(10, 10, 430, 10);
+            line(430, 10, 430, 430);
+            line(10, 430, 430, 430);
+            draw(s, dot);
+            for (int i = 0; i < 20; ++i) {
+                for (int j = 0; j < 20; ++j) {
+                    if (map[i][j] == 1) {
+                        draw_wall(i, j);
+                    }
+                }
+            }
+            draw_food(fruit_x, fruit_y, dot);
+            setFont(40);
+            settextcolor(CT_SCORE);
+            setlinecolor(CT_SCORE);
+            outtextxy(2 * (10), 2 * (225), (wstring{L"Scores: "} + to_wstring(score)).c_str());
+            EndBatchDraw();
+            SnakeNode* last = s->s;
+            s->s = s->s->next;
+            delete last;
+            s->status = !s->status;
+            Sleep(200);
+        }
+    } else {
+        SnakeNode *curh, *curt;
+        curh = s->s;
+        int i = 0;
+        while (1) {
+            curh = curh->next;
+            curt = curh->next;
+            if (curh->x == hit_x and curh->y == hit_y) {
+                break;
+            }
+            if (curh == nullptr) {
+                break;
+            }
+        }
+        int flag1 = 0;
+        int flag2 = 0;
+        while (!(flag1 and curt == nullptr)) {
+            BeginBatchDraw();
+            cleardevice();
+            setlinecolor(C_SB);
+            setlinestyle(PS_SOLID | PS_ENDCAP_SQUARE, 20);
+            line(10, 10, 10, 430);
+            line(10, 10, 430, 10);
+            line(430, 10, 430, 430);
+            line(10, 430, 430, 430);
+            draw(s, dot);
+            for (int i = 0; i < 20; ++i) {
+                for (int j = 0; j < 20; ++j) {
+                    if (map[i][j] == 1) {
+                        draw_wall(i, j);
+                    }
+                }
+            }
+            draw_food(fruit_x, fruit_y, dot);
+            setFont(40);
+            settextcolor(CT_SCORE);
+            setlinecolor(CT_SCORE);
+            outtextxy(2 * (10), 2 * (225),
+                      (wstring{L"Scores: "} + to_wstring(score)).c_str());
+            EndBatchDraw();
+
+            if (curt != nullptr) {
+                if (flag1) {
+                    s->s = curt->next;
+                    delete curt;
+                    curt = s->s;
+                    curt and (curt->last = nullptr);
+                } else {
+                    SnakeNode* t = curt->next;
+                    delete curt;
+                    curt = t;
+                    curh->next = curt;
+                    if (curt) {
+                        curt->last = curh;
+                    }
+                }
+            }
+            if (!flag1 and curh != nullptr) {
+                if (curh->last != nullptr) {
+                    curh = curh->last;
+                    delete curh->next;
+                    curh->next = curt;
+                    if (curt) {
+                        curt->last = curh;
+                    }
+                } else {
+                    flag1 = 1;
+                    s->s = curh->next;
+                    curh->next && (curh->next->last = nullptr);
+                    delete curh;
+                }
+            }
+            Sleep(200);
+        }
+    }
+    end_game(score);
+    return start;
 }

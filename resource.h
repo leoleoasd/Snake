@@ -6,7 +6,6 @@
 #define S_OFFSET_Y 20
 
 extern int colors[][3];
-
 extern int themes_count;
 extern int theme_selected;
 
@@ -37,3 +36,4 @@ extern int theme_selected;
 #define KEY_DOWN 80
 #define KEY_LEFT 75
 #define KEY_RIGHT 77
+#define KEY_ESCAPE 27
