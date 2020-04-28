@@ -44,24 +44,25 @@ funcPtr start() {
                 }
             }
         }
-        if (_kbhit()) {
-            int key = _getch();
+        if (key_queue.size()) {
+            int key = key_queue.front();
+            key_queue.pop();
             switch (key) {
-                case KEY_LEFT:
+                case VK_LEFT:
                     theme_selected = (theme_selected + 1) % themes_count;
                     break;
-                case KEY_RIGHT:
+                case VK_RIGHT:
                     theme_selected =
                         (theme_selected + themes_count - 1) % themes_count;
                     break;
-                case KEY_UP:
+                case VK_UP:
                     map_selected = (map_selected + maps_count - 1) % maps_count;
                     break;
-                case KEY_DOWN:
+                case VK_DOWN:
                     map_selected = (map_selected + 1) % maps_count;
                     break;
-                case '\r':
-                case ' ':
+                case VK_RETURN:
+                case VK_SPACE:
                     return game;
             }
         }

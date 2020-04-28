@@ -31,9 +31,3 @@ extern int theme_selected;
 
 #define TIK (int(0.25 * CLOCKS_PER_SEC))
 #define DOT_TIK (int(0.125 * CLOCKS_PER_SEC))
-
-#define KEY_UP 72
-#define KEY_DOWN 80
-#define KEY_LEFT 75
-#define KEY_RIGHT 77
-#define KEY_ESCAPE 27

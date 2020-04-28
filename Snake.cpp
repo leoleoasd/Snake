@@ -6,7 +6,8 @@
 #pragma comment(lib, "winmm.lib")
 using namespace std;
 
-std::queue<wchar_t> key_queue;
+std::queue<wchar_t> char_queue;
+std::queue<int> key_queue;
 
 LRESULT CALLBACK GetMsgProc(_In_ int nCode,
                             _In_ WPARAM wParam,
@@ -14,20 +15,14 @@ LRESULT CALLBACK GetMsgProc(_In_ int nCode,
     if (nCode < 0 || wParam == 0)
         return CallNextHookEx(NULL, nCode, wParam,
                               lParam);
-
     auto msg = (MSG *)lParam;
-
-    static wstring_convert<std::codecvt_byname<wchar_t, char, mbstate_t>>
-    conv1(
-      new std::codecvt_byname<wchar_t, char, mbstate_t>(
-          ".936"));
     switch (msg->message) {
         case WM_CHAR:
-            key_queue.push(msg->wParam);
-            if (msg->wParam > 0xd800) {
-                cout << "??";
-            } else {
-                cout << conv1.to_bytes(msg->wParam);
+            char_queue.push(msg->wParam);
+            return 1;
+        case WM_KEYDOWN:
+            if (msg->wParam != 229) { // Ignore place holder key codes.
+                key_queue.push(msg->wParam);
             }
             return 1;
     }

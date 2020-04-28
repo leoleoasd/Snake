@@ -21,6 +21,7 @@ Snake* makeStartSnake() {
     tail = tail->next;
     tail->next = new SnakeNode(12, 9, 0, SnakeType::TAIL, tail);
     tail = tail->next;
+    ret->size = 5;
     return ret;
 }
 
@@ -46,7 +47,9 @@ void pause_game() {
     setlinestyle(PS_SOLID | PS_ENDCAP_SQUARE, 4);
     rectangle(2 * (72 - 2), 2 * (140 - 2), 2 * (148 + 2), 2 * (170 + 2));
     outtextxy(2 * (72), 2 * (140), L"PAUSE");
-    _getch();
+    while (key_queue.size() == 0)
+        ;
+    key_queue.pop();
     cleardevice();
 }
 
@@ -64,23 +67,30 @@ void end_game(int scores) {
     //std::wstring_convert<std::codecvt_byname<wchar_t, char, mbstate_t>> conv1(
     //    new std::codecvt_byname<wchar_t, char, mbstate_t>(
     //        ".936"));
-    key_queue = queue<wchar_t>(); // Clear queue;
+    char_queue = queue<wchar_t>(); // Clear queue;
     while (true) {
         int flag = 0;
-        while (!key_queue.empty()) {
-            wchar_t c = key_queue.front();
-            key_queue.pop();
+        while (!char_queue.empty()) {
+            wchar_t c = char_queue.front();
+            char_queue.pop();
             if (name.size() < 20) {
                 if (!iswcntrl(c)) {
                     name = name + c;
                 }
             }
+        }
+        while (key_queue.size()) {
+            int key = key_queue.front();
+            key_queue.pop();
             if (name.size() > 0) {
-                if (c == '\b') {
+                if (key == VK_BACK) {
                     name = name.substr(0, name.size() - 1);
+                    if (name[name.size() - 1] > 0xd800) {
+                        name = name.substr(0, name.size() - 1);
+                    }
                 }
             }
-            if (c == '\r') {
+            if (key == VK_RETURN) {
                 flag = 1;
                 break;
             }
@@ -98,9 +108,6 @@ void end_game(int scores) {
         setFont(30);
         outtextxy(50, 160, (L"Name:" + name).c_str());
         EndBatchDraw();
-    }
-    while (_kbhit()) {
-        _getch();
     }
     wstring rk_names[5];
     int rk_scores[5] = {0};
@@ -167,8 +174,10 @@ void end_game(int scores) {
         }
     }
     fout.close();
-
-    _getch();
+    while (key_queue.size() == 0) {
+        Sleep(20);
+    }
+    key_queue.pop();
 }
 
 funcPtr game() {
@@ -208,18 +217,19 @@ funcPtr game() {
     
     mciSendString(L"stop bgm", NULL, 0, NULL);
     mciSendString(L"play game repeat", NULL, 0, NULL);
-
+    key_queue = queue<int>();
     while (true) {
         // Keyboard Event Handling.
         eating = 0;
         moving = 0;
-        if (_kbhit()) {
-            auto key = _getch();
+        if (key_queue.size()) {
+            int key = key_queue.front();
+            key_queue.pop();
             switch (key) {
-                case KEY_ESCAPE:
+                case VK_ESCAPE:
                     pause_game();
                     continue;
-                case KEY_UP:
+                case VK_UP:
                     if (s->heading == 3)
                         moving = 1;
                     if (s->heading == 0 or s->heading == 2) {
@@ -228,7 +238,7 @@ funcPtr game() {
                         moving = 1;
                     }
                     break;
-                case KEY_DOWN:
+                case VK_DOWN:
                     if (s->heading == 1)
                         moving = 1;
                     if (s->heading == 0 or s->heading == 2) {
@@ -237,7 +247,7 @@ funcPtr game() {
                         moving = 1;
                     }
                     break;
-                case KEY_LEFT:
+                case VK_LEFT:
                     if (s->heading == 0)
                         moving = 1;
                     if (s->heading == 1 or s->heading == 3) {
@@ -246,7 +256,7 @@ funcPtr game() {
                         moving = 1;
                     }
                     break;
-                case KEY_RIGHT:
+                case VK_RIGHT:
                     if (s->heading == 2)
                         moving = 1;
                     if (s->heading == 1 or s->heading == 3) {
@@ -316,6 +326,8 @@ funcPtr game() {
 
     mciSendString(L"stop game", NULL, 0, NULL);
 
+    time_t duration = (1000.0 / s->size + 1);
+
     if (hit_wall) {
         while (s->s != nullptr) {
 
@@ -345,7 +357,7 @@ funcPtr game() {
             s->s = s->s->next;
             delete last;
             s->status = !s->status;
-            Sleep(200);
+            Sleep(duration);
         }
     } else {
         SnakeNode *curh, *curt;
@@ -419,7 +431,7 @@ funcPtr game() {
                     delete curh;
                 }
             }
-            Sleep(200);
+            Sleep(duration);
         }
     }
     end_game(score);

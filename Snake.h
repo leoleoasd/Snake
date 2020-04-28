@@ -21,8 +21,8 @@ typedef int map_t[20][20];
 extern map_t maps[];
 extern int maps_count;
 extern int map_selected;
-extern std::queue<wchar_t> key_queue;
-
+extern std::queue<wchar_t> char_queue;
+extern std::queue<int> key_queue;
 
 struct SnakeNode {
     int x = 0;
@@ -47,6 +47,7 @@ struct Snake {
     SnakeNode* s;
     int heading;
     int status = 1;
+    int size;
 
     Snake() : s(nullptr), heading(0) {}
 
@@ -69,6 +70,7 @@ struct Snake {
     }
 
     std::tuple<int, int> move(int eating) {
+        size += eating;
         status = !status;
         auto [tox, toy] = this->towards();
         SnakeNode* newhead =
