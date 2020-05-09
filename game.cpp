@@ -7,6 +7,8 @@
 
 #include "Snake.h"
 using namespace std;
+int cur_x;
+int cur_y;
 
 Snake* makeStartSnake() {
     Snake* ret = new Snake;
@@ -84,10 +86,8 @@ void end_game(int scores) {
             key_queue.pop();
             if (name.size() > 0) {
                 if (key == VK_BACK) {
+                    cout << "DELETING";
                     name = name.substr(0, name.size() - 1);
-                    if (name[name.size() - 1] > 0xd800) {
-                        name = name.substr(0, name.size() - 1);
-                    }
                 }
             }
             if (key == VK_RETURN) {
@@ -106,7 +106,10 @@ void end_game(int scores) {
         outtextxy(70, 90, output.c_str());
 
         setFont(30);
-        outtextxy(50, 160, (L"Name:" + name).c_str());
+        moveto(50, 160);
+        outtext((L"Name:" + name).c_str());
+        cur_x = getx();
+        cur_y = gety();
         EndBatchDraw();
     }
     wstring rk_names[5];

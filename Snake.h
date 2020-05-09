@@ -23,6 +23,10 @@ extern int maps_count;
 extern int map_selected;
 extern std::queue<wchar_t> char_queue;
 extern std::queue<int> key_queue;
+extern int cur_x;
+extern int cur_y;
+extern HWND hWnd;
+
 
 struct SnakeNode {
     int x = 0;
