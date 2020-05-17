@@ -49,8 +49,9 @@ void pause_game() {
     setlinestyle(PS_SOLID | PS_ENDCAP_SQUARE, 4);
     rectangle(2 * (72 - 2), 2 * (140 - 2), 2 * (148 + 2), 2 * (170 + 2));
     outtextxy(2 * (72), 2 * (140), L"PAUSE");
-    while (key_queue.size() == 0)
-        ;
+    while (key_queue.size() == 0) {
+        Sleep(20);
+    }
     key_queue.pop();
     cleardevice();
 }
@@ -216,7 +217,7 @@ funcPtr game() {
     int hit_body = 0;
     int hit_x = 0;
     int hit_y = 0;
-
+    
     
     mciSendString(L"stop bgm", NULL, 0, NULL);
     mciSendString(L"play game repeat", NULL, 0, NULL);
@@ -282,8 +283,10 @@ funcPtr game() {
                 break;
             }
             eating = (tox == fruit_x and toy == fruit_y);
-            auto [tx,ty] = s->move(eating);
-            map[tx][ty] = 0;
+            auto [tx,ty, tail] = s->move(eating);
+            if (tail) {
+                map[tx][ty] = 0;
+            }
             if (map[tox][toy] == 2) {
                 hit_body = 1;
                 hit_x = s->s->x;

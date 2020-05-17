@@ -73,7 +73,7 @@ struct Snake {
                                (this->s->y + Snake::dir[heading][1] + 20) % 20);
     }
 
-    std::tuple<int, int> move(int eating) {
+    std::tuple<int, int,bool> move(int eating) {
         size += eating;
         status = !status;
         auto [tox, toy] = this->towards();
@@ -93,6 +93,7 @@ struct Snake {
         this->s = newhead;
         int retx = 0;
         int rety = 0;
+        int retbool = false;
         if (!eating) {
             while (newhead->next != nullptr) {
                 newhead = newhead->next;
@@ -101,10 +102,11 @@ struct Snake {
             newhead->last->direction = newhead->last->last->direction;
             retx = newhead->x;
             rety = newhead->y;
+            retbool = true;
             newhead->last->next = nullptr;
             delete newhead;
         }
-        return std::make_tuple(retx, rety);
+        return std::make_tuple(retx, rety, retbool);
     }
 };
 
